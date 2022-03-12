@@ -1,0 +1,47 @@
+{
+  "presets": [
+    "@babel/preset-typescript",
+    "@babel/preset-react",
+    [
+      "@babel/preset-env",
+      {
+        "useBuiltIns": "entry",
+        "corejs": { "version": 2, "proposals": true }
+      }
+    ]
+  ],
+  "plugins": [
+    "macros",
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-transform-modules-commonjs",
+    "dynamic-import-node",
+    "babel-plugin-styled-components",
+    "react-docgen",
+    "add-react-displayname",
+    [
+      "transform-imports",
+      {
+        "@fortawesome/pro-solid-svg-icons": {
+          "transform": "@fortawesome/pro-solid-svg-icons/${member}",
+          "skipDefaultConversion": true
+        },
+        "@fortawesome/pro-light-svg-icons": {
+          "transform": "@fortawesome/pro-light-svg-icons/${member}",
+          "skipDefaultConversion": true
+        },
+        "@fortawesome/pro-regular-svg-icons": {
+          "transform": "@fortawesome/pro-regular-svg-icons/${member}",
+          "skipDefaultConversion": true
+        },
+        "lodash": {
+          "transform": "lodash/${member}",
+          "preventFullImport": true
+        }
+      }
+    ],
+    "@babel/plugin-syntax-dynamic-import",
+    "@babel/plugin-syntax-import-meta",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-json-strings"
+  ]
+}

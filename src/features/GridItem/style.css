@@ -1,0 +1,43 @@
+.grid-item {
+  background-color: white;
+  padding: 10px;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+}
+
+.grid-item:hover {
+  opacity: 0.6;
+}
+
+.bb {
+  border-bottom: 1px solid black;
+}
+
+.br {
+  border-right: 1px solid black;
+}
+
+.bt {
+  border-top: 1px solid black;
+}
+
+.bl {
+  border-left: 1px solid black;
+}
+
+.dl {
+  background: linear-gradient(135deg, transparent calc(50% - 1px), red 50%, transparent calc(50% + 1px));
+}
+
+.dr {
+  background: linear-gradient(45deg, transparent calc(50% - 1px), red 50%, transparent calc(50% + 1px));
+}
+
+.hl {
+  background: linear-gradient(180deg, transparent calc(50% - 1px), red 50%, transparent calc(50% + 1px));
+}
+
+.vl {
+  background: linear-gradient(90deg, transparent calc(50% - 1px), red 50%, transparent calc(50% + 1px));
+}

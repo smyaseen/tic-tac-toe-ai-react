@@ -1,0 +1,35 @@
+# node_modules and bower_components are ignored by default.
+
+# Ignore dev libraries.
+
+# Test directories to ignore.
+/src/__test__
+*.test.js
+
+# Database directories.
+
+# Build directories
+/dist
+
+# Misc directories.
+/.settings
+/cache
+/server/credentials
+/src/trash
+*.config.js
+dependency-build/
+node_modules/
+
+server.js
+server.dev.js
+
+*.stories.jsx
+/cypress
+ui_tests
+*.spec.js
+*.page.js
+
+/mobile
+/mobile/*
+forked_libraries/*
+.eslintrc.js

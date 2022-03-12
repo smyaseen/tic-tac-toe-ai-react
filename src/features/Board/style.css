@@ -1,0 +1,42 @@
+.main {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  text-align: center;
+  font-size: 50px;
+}
+
+.grid-item {
+  background-color: white;
+  padding: 10px;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+}
+
+.grid-item:hover {
+  opacity: 0.6;
+}
+
+.bb {
+  border-bottom: 1px solid black;
+}
+
+.br {
+  border-right: 1px solid black;
+}
+
+.bt {
+  border-top: 1px solid black;
+}
+
+.bl {
+  border-left: 1px solid black;
+}
