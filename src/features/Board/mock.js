@@ -18,8 +18,20 @@ const Board = () => {
   }, [moveCount]);
 
   useEffect(() => {
+    if (moveCount % 2 === 0 && (!isGameDraw || !isGameEnd)) {
+      console.log('CALLED');
+      const cellNo = bestSpot();
+      console.log(cellNo);
+      setBoard(prev => ({ ...prev, [cellNo]: { value: 'X' } }));
+      setMoveCount(prev => prev + 1);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [board]);
+
+  useEffect(() => {
     if (!isGameDraw && isGameEnd) {
-      const player = moveCount % 2 === 0 ? 'human' : 'ai';
+      const player = moveCount % 2 === 0 ? 'ai' : 'human';
       setScore(prev => {
         return { ...prev, [player]: prev[player] + 1 };
       });
@@ -28,16 +40,14 @@ const Board = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isGameEnd]);
 
-  useEffect(() => {
-    if (moveCount % 2 === 0 && (!isGameDraw || !isGameEnd)) {
-      const { cellNo } = minimax({ ...board }, moveCount, false, 0);
-      // setBoard(prev => ({ ...prev, [cellNo]: { value: 'X' } }));
-      setMarker(cellNo);
-      // setMoveCount(prev => prev + 1);
-    }
+  const setMarker = cellNo => {
+    if (board[cellNo] || isGameEnd) return;
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [board]);
+    moveCount % 2 === 0
+      ? setBoard(prev => ({ ...prev, [cellNo]: { value: 'X' } }))
+      : setBoard(prev => ({ ...prev, [cellNo]: { value: 'O' } }));
+    setMoveCount(prev => prev + 1);
+  };
 
   const renderGridItems = () => {
     const items = [];
@@ -47,15 +57,6 @@ const Board = () => {
     }
 
     return items;
-  };
-
-  const setMarker = cellNo => {
-    if (board[cellNo] || isGameEnd) return;
-
-    moveCount % 2 === 0
-      ? setBoard(prev => ({ ...prev, [cellNo]: { value: 'X' } }))
-      : setBoard(prev => ({ ...prev, [cellNo]: { value: 'O' } }));
-    setMoveCount(prev => prev + 1);
   };
 
   const checkGameEnd = () => {
@@ -153,9 +154,48 @@ const Board = () => {
     }
   };
 
-  const utility = board => {
-    const player = moveCount % 2 === 0 ? 'ai' : 'human';
-    let isGameWon = false;
+  const terminal = () => {
+    if (!isGameDraw && isGameEnd) {
+      if (moveCount % 2 === 0) {
+        return true;
+      }
+      return false;
+    }
+
+    return isGameDraw;
+  };
+
+  const utility = () => {
+    if (!isGameDraw && isGameEnd) {
+      if (moveCount % 2 === 0) {
+        return 1;
+      }
+      return -1;
+    }
+
+    if (isGameDraw) return 0;
+  };
+
+  const actions = board => {
+    const marker = moveCount % 2 === 0 ? 'X' : 'O';
+  };
+
+  function bestSpot() {
+    return miniMax({ ...board }, 'X').cellNo;
+  }
+
+  const emptyCells = newBoard => {
+    const availSpots = [];
+
+    for (let i = 1; i < 10; i++) {
+      !newBoard[i] && availSpots.push(i);
+    }
+    console.log(availSpots, 'availSpots');
+    return availSpots;
+  };
+
+  const checkWin = (board, player) => {
+    let index;
 
     if (
       board[1] &&
@@ -164,7 +204,7 @@ const Board = () => {
       board[1]?.value === board[2]?.value &&
       board[1]?.value === board[3]?.value
     ) {
-      isGameWon = true;
+      index = 1;
     } else if (
       board[4] &&
       board[5] &&
@@ -172,7 +212,7 @@ const Board = () => {
       board[4]?.value === board[5]?.value &&
       board[4]?.value === board[6]?.value
     ) {
-      isGameWon = true;
+      index = 4;
     } else if (
       board[7] &&
       board[8] &&
@@ -180,7 +220,7 @@ const Board = () => {
       board[7]?.value === board[8]?.value &&
       board[7]?.value === board[9]?.value
     ) {
-      isGameWon = true;
+      index = 7;
     } else if (
       board[1] &&
       board[4] &&
@@ -188,7 +228,7 @@ const Board = () => {
       board[1]?.value === board[4]?.value &&
       board[1]?.value === board[7]?.value
     ) {
-      isGameWon = true;
+      index = 1;
     } else if (
       board[2] &&
       board[5] &&
@@ -196,7 +236,7 @@ const Board = () => {
       board[2]?.value === board[5]?.value &&
       board[2]?.value === board[8]?.value
     ) {
-      isGameWon = true;
+      index = 2;
     } else if (
       board[3] &&
       board[6] &&
@@ -204,7 +244,7 @@ const Board = () => {
       board[3]?.value === board[6]?.value &&
       board[3]?.value === board[9]?.value
     ) {
-      isGameWon = true;
+      index = 3;
     } else if (
       board[1] &&
       board[5] &&
@@ -212,7 +252,7 @@ const Board = () => {
       board[1]?.value === board[5]?.value &&
       board[1]?.value === board[9]?.value
     ) {
-      isGameWon = true;
+      index = 1;
     } else if (
       board[3] &&
       board[5] &&
@@ -220,100 +260,69 @@ const Board = () => {
       board[3]?.value === board[5]?.value &&
       board[3]?.value === board[7]?.value
     ) {
-      isGameWon = true;
+      index = 3;
     }
 
-    if (isGameWon) {
-      if (player === 'ai') return 1;
-      return -1;
-    }
-    return 0;
+    if (board[index]?.value === player) return true;
+
+    return false;
   };
 
-  const terminal = (board, moveCount) => {
-    const state = utility(board);
+  const miniMax = (newBoard, player) => {
+    const availSpots = emptyCells(newBoard);
 
-    if (state === 0) {
-      if (moveCount === 9) return { state, condition: true };
-      return { state, condition: false };
+    if (checkWin(newBoard, 'O')) {
+      console.log('O');
+
+      return { score: -10 };
+    } else if (checkWin(newBoard, 'X')) {
+      console.log('AI');
+
+      return { score: 10 };
+    } else if (availSpots.length === 0) {
+      console.log('DRAW');
+      return { score: 0 };
     }
 
-    return { state, condition: true };
-  };
+    const moves = [];
+    for (let i = 0; i < availSpots.length; i++) {
+      const move = {};
+      move.cellNo = availSpots[i];
+      newBoard[availSpots[i]] = player;
 
-  const result = (board, position) => {
-    const playerMark = moveCount % 2 === 0 ? 'X' : 'O';
-
-    board[position] = { value: playerMark };
-
-    return board;
-  };
-
-  const actions = newBoard => {
-    const availSpots = [];
-
-    for (let i = 1; i < 10; i++) {
-      !newBoard[i] && availSpots.push(i);
-    }
-
-    return availSpots;
-  };
-
-  const minimax = (state, moveCount, isMaximizing, depth) => {
-    const { state: terminalState, condition } = terminal(state, moveCount);
-
-    if (condition) {
-      return { score: terminalState };
-    }
-
-    const scores = [];
-    if (isMaximizing) {
-      let v = -Infinity;
-
-      for (const action of actions(state)) {
-        const { score } = minimax(result(state, action), moveCount + 1, false, 1 - depth);
-        v = Math.max(score, v);
-        console.log(v, 'v max', depth, moveCount);
-
-        scores.push({ score: v - depth + moveCount, cellNo: action });
+      if (player == 'X') {
+        const result = miniMax(newBoard, 'O');
+        move.score = result.score;
+      } else {
+        const result = miniMax(newBoard, 'X');
+        move.score = result.score;
       }
-    } else {
-      let v = Infinity;
 
-      for (const action of actions(state)) {
-        const { score } = minimax(result(state, action), moveCount + 1, true, 1 + depth);
+      newBoard[availSpots[i]] = move.cellNo;
 
-        v = Math.min(score, v);
-        console.log(v, 'v min', depth, moveCount);
-        scores.push({ score: v + depth - moveCount, cellNo: action });
-      }
+      moves.push(move);
     }
 
     let bestMove;
-
-    const player = moveCount % 2 === 0 ? 'X' : 'O';
-
     if (player === 'X') {
       let bestScore = -10000;
-      for (let i = 0; i < scores.length; i++) {
-        if (scores[i].score > bestScore) {
-          bestScore = scores[i].score;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score > bestScore) {
+          bestScore = moves[i].score;
           bestMove = i;
         }
       }
-
-      console.log(scores, 'scores');
     } else {
       let bestScore = 10000;
-      for (let i = 0; i < scores.length; i++) {
-        if (scores[i].score < bestScore) {
-          bestScore = scores[i].score;
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].score < bestScore) {
+          bestScore = moves[i].score;
           bestMove = i;
         }
       }
     }
-
-    return scores[bestMove];
+    console.log(moves, bestMove, 'moves');
+    return moves[bestMove];
   };
 
   const reset = () => {
